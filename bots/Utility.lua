@@ -410,4 +410,20 @@ function Utility.FindTarget(dist)
 	return candidate,damage,MaxScore;
 end
 
+function Utility.GetWeakestCreep(creeps)	
+	local WeakestCreep=nil;
+	local LowestHealth=10000;
+	
+	for _,creep in pairs(creeps) do
+		if creep:IsAlive() then
+			if creep:GetHealth()<LowestHealth then
+				LowestHealth=creep:GetHealth();
+				WeakestCreep=creep;
+			end
+		end
+	end
+	
+	return WeakestCreep, LowestHealth;
+end
+
 return Utility;
