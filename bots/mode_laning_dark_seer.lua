@@ -1,55 +1,45 @@
 -------
-require( GetScriptDirectory().."/mode_laning_generic" )
+
 Utility = require(GetScriptDirectory().."/Utility")
 ----------
 
+local npcBot = GetBot();
 local lane = LANE_TOP;
+local distance = 1000;
+local curr_hp = 0.0;
+local last_harassed = GameTime();
+
+local ion_shell=npcBot:GetAbilityByName("dark_seer_ion_shell");
+	
+
+			
 if GetTeam()==TEAM_DIRE then
 	lane = LANE_BOT
 end
-local npcBot = GetBot();
-
-function OnStart()
-	
-	mode_generic_laning.OnStart();
-end
-
-function OnEnd()
-	mode_generic_laning.OnEnd();
-end
-
-function GetDesire()
---print(GetBot());
-	return 1.0;--return mode_generic_laning.GetDesire();
-end
 
 
-function WhereToStand()
---exp range
-	return GetLaneFrontLocation(GetTeam(),lane,-1000)
-end
+local function WhereToStand()
 
-function SpamIonShell()
-	--allied creeps
-	local creeps=npcBot:GetNearbyCreeps(1300,false)
-	mindist = 20000.0
-	print(GetTeam());
-	for _,creep in pairs(creeps) do
-		print(creep:GetAttackRange());
-		--if creep:GetAttackRange()==100
+	if(npcBot:WasRecentlyDamagedByAnyHero(2) or npcBot:WasRecentlyDamagedByTower(2)) then
+		distance = 3000
+	else
+		distance = 1000
 	end
-			
-	
+	return GetLaneFrontLocation(GetTeam(),lane,-distance)
 end
+
+
 
 
 
 function Think()
+	--print(last_hp)
+	
 	--if not casting 
 	--think about casting
-	--if you are being harrassed move back(flag harrased that takes 1-2 sec)
+	--if you are being harassed move back(flag harrased that takes 1-2 sec)
 	--if enemy is low make him more miserable
-	SpamIonShell();
+
 	npcBot:Action_MoveToLocation(WhereToStand());
 	
 end
