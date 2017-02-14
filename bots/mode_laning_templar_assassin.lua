@@ -2,6 +2,13 @@ local utils = require( GetScriptDirectory().."/Utility" )
 
 local EyeRange=1200;
 
+function GetDesire()
+	if DotaTime() < 900 then
+		return 0.3;
+	end
+	return 0.0;
+end
+
 local function getDesiredPos()
 	mid = GetLaneFrontLocation(TEAM_RADIANT, LANE_MID, 0.0) - Vector(100,100);
 	--print (mid);
