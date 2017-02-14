@@ -6,7 +6,7 @@ Utility = require(GetScriptDirectory().."/Utility")
 
 function GetDesire()
 	if not Utility.IsItemInInventory("item_blink") then
-		return 1.0
+		return 0.9
 	else
 		--print(mode_generic_farm.GetDesire())
 		--return mode_generic_farm.GetDesire()
