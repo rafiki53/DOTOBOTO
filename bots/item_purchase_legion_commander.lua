@@ -90,26 +90,26 @@ local function LevelUp()
 	local ability=npcBot:GetAbilityByName(Talents[1]);
 	
 	if (ability~=nil and ability:CanAbilityBeUpgraded() and ability:GetLevel()<ability:GetMaxLevel()) then
-		npcBot:Action_LevelAbility(Talents[1]);
+		npcBot:ActionImmediate_LevelAbility(Talents[1]);
 		table.remove( Talents, 1 );
 	end	
 	
 	if ar~=nil and ar:CanAbilityBeUpgraded() then
-		npcBot:Action_LevelAbility(Abilities[4]);
+		npcBot:ActionImmediate_LevelAbility(Abilities[4]);
 		return;
 	end
 	
 	if ae~=nil and ae:CanAbilityBeUpgraded() then
-		npcBot:Action_LevelAbility(Abilities[3]);
+		npcBot:ActionImmediate_LevelAbility(Abilities[3]);
 		return;
 	end
 	if aw~=nil and aw:CanAbilityBeUpgraded() then
-		npcBot:Action_LevelAbility(Abilities[2]);
+		npcBot:ActionImmediate_LevelAbility(Abilities[2]);
 		return;
 	end	
 	
 	if aq~=nil and aq:CanAbilityBeUpgraded() then
-		npcBot:Action_LevelAbility(Abilities[1]);
+		npcBot:ActionImmediate_LevelAbility(Abilities[1]);
 		return;
 	end
 
@@ -133,7 +133,7 @@ function ItemPurchaseThink()
 	
 	if (not IsItemPurchasedFromSecretShop(NextItem)) and (not(IsItemPurchasedFromSideShop(NextItem) and npcBot:DistanceFromSideShop()<=2200)) then
 		if ( npcBot:GetGold() >= GetItemCost( NextItem ) ) then
-			npcBot:Action_PurchaseItem( NextItem );
+			npcBot:ActionImmediate_PurchaseItem( NextItem );
 			table.remove(ItemsToBuy);
 		end
 	end
