@@ -1,30 +1,40 @@
 local utils = require( GetScriptDirectory().."/Utility" )
 
 local EyeRange=1200;
-local npcBot=GetBot();
-
-local function HandleRefraction()
-	if ( npcBot:IsUsingAbility()) then 
-		return 0;
-	end;
-	local EnemyCreeps = npcBot:GetNearbyCreeps(EyeRange,true);
-	local EnemyHeroes = npcBot:GetNearbyHeroes(EyeRange, true, BOT_MODE_NONE);
-	local WeakestCreep, WeakestCreepHealth = utils.GetWeakestCreep(EnemyCreeps);
-	if ( #EnemyHeroes == 0 and #EnemyCreeps == 0 ) then 
-		return 0;
-	end
-	return 1;
-end
 
 local function getDesiredPos()
-	local EnemyCreeps = npcBot:GetNearbyCreeps(EyeRange,true);
+	mid = GetLaneFrontLocation(TEAM_RADIANT, LANE_MID, 0.0) - Vector(100,100);
+	--print (mid);
+	--DebugDrawCircle(mid, 100, 0.5, 0.5, 0.5);
+	local npcBot=GetBot();
+	
+	local EnemyCreeps = npcBot:GetNearbyLaneCreeps(EyeRange,true);
 	local WeakestCreep, WeakestCreepHealth = utils.GetWeakestCreep(EnemyCreeps);
-	if WeakestCreep == nil then return Vector(-700, -700) end;
-	return WeakestCreep:GetLocation() + Vector(-50, -50);
+	if WeakestCreep == nil or WeakestCreepHealth == WeakestCreep:GetMaxHealth() then 
+		return mid; 
+	end;
+	
+	
+	local EnemyHeroes = npcBot:GetNearbyHeroes(EyeRange, true, BOT_MODE_NONE);
+	if #EnemyHeroes == 0 then
+		return WeakestCreep:GetLocation() + Vector(-80, -80);
+	end
+	
+	enemy = EnemyHeroes[1];
+	direction_vector = WeakestCreep:GetLocation() - enemy:GetLocation();
+	norm = math.sqrt(direction_vector[1] * direction_vector[1] + direction_vector[2] * direction_vector[2]);
+	
+	range = npcBot:GetAttackRange();
+	scalar = 1.0 * range / norm;
+	DesiredLocation = WeakestCreep:GetLocation() + direction_vector * scalar;
+	return DesiredLocation;
 end
 
 local function LastHit()
-	local EnemyCreeps = npcBot:GetNearbyCreeps(EyeRange,true);
+
+	local npcBot=GetBot();
+	
+	local EnemyCreeps = npcBot:GetNearbyLaneCreeps(EyeRange,true);
 	local WeakestCreep, WeakestCreepHealth = utils.GetWeakestCreep(EnemyCreeps);
 	AttackRange=npcBot:GetAttackRange();
 	AttackSpeed=npcBot:GetAttackPoint();
@@ -40,7 +50,10 @@ local function LastHit()
 end
 
 local function Deny()
-	local AllyCreeps = npcBot:GetNearbyCreeps(EyeRange,false);
+
+	local npcBot=GetBot();
+
+	local AllyCreeps = npcBot:GetNearbyLaneCreeps(EyeRange,false);
 	local WeakestCreep, WeakestCreepHealth = utils.GetWeakestCreep(AllyCreeps);
 	AttackRange=npcBot:GetAttackRange();
 	AttackSpeed=npcBot:GetAttackPoint();
@@ -55,22 +68,36 @@ local function Deny()
 	end
 end
 
-function Think() 
-	if ( npcBot:IsUsingAbility() or not npcBot:IsAlive()) then return end;
+local function Harass()
+
+	local npcBot=GetBot();
 	
-	useRefraction = HandleRefraction()
-	if useRefraction == 1 then
-		abilityREF = npcBot:GetAbilityByName( "templar_assassin_refraction" );
-		if abilityREF:IsCooldownReady() then
-			npcBot:Action_UseAbility(abilityREF);
-			return;
-		end
+	local EnemyCreeps = npcBot:GetNearbyLaneCreeps(EyeRange,true);
+	local EnemyHeroes = npcBot:GetNearbyHeroes(EyeRange, true, BOT_MODE_NONE);
+	
+	if #EnemyHeroes == 0 then
+		return;
 	end
 	
-	if ( npcBot:IsUsingAbility() ) then return end;
+	enemy = EnemyHeroes[1]
+	
+	if #EnemyCreeps > 0 and GetUnitToUnitDistance( npcBot, EnemyHeroes[1] ) > GetUnitToUnitDistance( npcBot, enemy ) then
+		return;
+	end
+	
+	npcBot:Action_AttackUnit(enemy, false);
+	
+end
+
+function Think()
+	
+	local npcBot=GetBot();
+	
+	if ( npcBot:IsUsingAbility() or not npcBot:IsAlive()) then return end;
 	
 	if LastHit() then return end;
 	if Deny() then return end;
+	if Harass() then return end;
 	local pos = getDesiredPos();
 	npcBot:Action_MoveToLocation(pos);
 end
