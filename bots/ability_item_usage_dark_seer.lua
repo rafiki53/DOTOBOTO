@@ -74,9 +74,9 @@ function ItemUsageThink()
 --pipe jak jest duzo naszych i duzo przeciwnikow i ktos kogos zaatakowal 
 end
 
-function CourierUsageThink()
-	npcBot=GetBot();
-	if (npcBot:GetStashValue()>1000 and IsCourierAvailable()) then
-		npcBot:Action_CourierDeliver();
-	end
-end
+--function CourierUsageThink()
+	--npcBot=GetBot();
+	--if (npcBot:GetStashValue()>1000 and IsCourierAvailable()) then
+	--	npcBot:Action_CourierDeliver();
+	--end
+--end
