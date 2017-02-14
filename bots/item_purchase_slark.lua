@@ -80,13 +80,14 @@ function LevelUp()
         print( "Warning: Ability " .. Ability_Name .. " not found." )
     elseif( Ability:CanAbilityBeUpgraded() and Ability:GetLevel() < Ability:GetMaxLevel() ) 
     then
-        Bot:Action_LevelAbility( Ability_Name );
-        table.remove( Ability_Priority, 1 )
+        Bot:ActionImmediate_LevelAbility( Ability_Name )
         print( "Ability upgraded successfully." )
     else
         print( "Warning: ability " .. Ability_Name .. " can not be upgraded." )
     end
 
+    table.remove( Ability_Priority, 1 )
+    
 end
 
 
@@ -110,7 +111,7 @@ function ItemPurchaseThink()
        and Bot:GetGold() >= GetItemCost( Item )
     then
         print( "Buying " .. Item )
-        Bot:Action_PurchaseItem( Item )
+        Bot:ActionImmediate_PurchaseItem( Item )
         table.remove( Items, 1 )
 	end
 
