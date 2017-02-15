@@ -1,4 +1,4 @@
-fItems = require( GetScriptDirectory() .. "/items" )
+fItems = require( GetScriptDirectory() .. "/items_slark" )
 
 
 Items = fItems.Items;

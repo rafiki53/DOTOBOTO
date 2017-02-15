@@ -1,4 +1,4 @@
-fItems = require( GetScriptDirectory() .. "/items" )
+fItems = require( GetScriptDirectory() .. "/items_slark" )
 
 
 Items = fItems.Items;
@@ -11,7 +11,7 @@ function GetDesire()
 
     if IsItemPurchasedFromSideShop( Item ) and Bot:GetGold() >= GetItemCost( Item )
     then
-        return 600 / ( 1 + Bot:DistanceFromSideShop() )
+        return math.min(1.0, 600.0 / ( 1 + Bot:DistanceFromSideShop() ))
     else
         return BOT_MODE_DESIRE_NONE
 	end

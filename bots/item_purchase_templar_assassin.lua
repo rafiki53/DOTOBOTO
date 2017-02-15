@@ -75,7 +75,7 @@ function ItemPurchaseThink()
 	local pID = npcBot:GetPlayerID() - 1;	
 	
 	havetp = (npcBot:FindItemSlot("item_tpscroll") ~= -1);
-	if not havetp and DotaTime() >= 300 and npcBot:GetGold() >= GetItemCost( "item_tpscroll" ) then
+	if not havetp and DotaTime() >= 100 and npcBot:GetGold() >= GetItemCost( "item_tpscroll" ) then
 		npcBot:ActionImmediate_PurchaseItem( "item_tpscroll" );
 		return;
 	end
@@ -92,7 +92,11 @@ function ItemPurchaseThink()
 	npcBot:SetNextItemPurchaseValue( GetItemCost( sNextItem ) );
 	secretShopThreshold = 120;
 	if IsItemPurchasedFromSecretShop( sNextItem ) then
-		npcBot.secretShopMode = true;
+		if npcBot:GetGold() >= GetItemCost( sNextItem ) then
+			npcBot.secretShopMode = true;
+		else 
+			npcBot.secretShopMode = false;
+		end
 		if ( npcBot:DistanceFromSecretShop() <= secretShopThreshold and npcBot:GetGold() >= GetItemCost( sNextItem )) then
 			npcBot:ActionImmediate_PurchaseItem( sNextItem );
 			table.remove( tableItemsToBuyAsMid, 1 );

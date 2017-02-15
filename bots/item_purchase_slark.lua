@@ -1,4 +1,4 @@
-fItems = require( GetScriptDirectory() .. "/items" )
+fItems = require( GetScriptDirectory() .. "/items_slark" )
 
 
 local Abilities =
@@ -131,7 +131,10 @@ function ItemPurchaseThink()
         LevelUp()
     end
 
-
+	if not Have( "item_tpscroll" ) and DotaTime() >= 100 and Bot:GetGold() >= GetItemCost( "item_tpscroll" ) 
+	then
+		Bot:ActionImmediate_PurchaseItem( "item_tpscroll" )
+	end
 
     while true
     do

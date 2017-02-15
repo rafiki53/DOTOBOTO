@@ -1,4 +1,4 @@
-local MyBots={"npc_dota_hero_dark_seer", "npc_dota_hero_templar_assassin","npc_dota_hero_crystal_maiden" , "npc_dota_hero_legion_commander", "npc_dota_hero_slark"};
+local MyBots={"npc_dota_hero_crystal_maiden", "npc_dota_hero_templar_assassin", "npc_dota_hero_dark_seer", "npc_dota_hero_legion_commander", "npc_dota_hero_slark"};
 
 function Think()
 	local IDs=GetTeamPlayers(GetTeam());
@@ -13,9 +13,9 @@ end
 function UpdateLaneAssignments()
 	if ( GetTeam() == TEAM_RADIANT ) then
 		return {
-			[1] = LANE_TOP,
+			[1] = LANE_BOT,
 			[2] = LANE_MID,
-			[3] = LANE_BOT,
+			[3] = LANE_TOP,
 			[4] = LANE_TOP,
 			[5] = LANE_BOT,
 		};
