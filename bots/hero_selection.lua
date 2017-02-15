@@ -1,4 +1,4 @@
-local MyBots={"npc_dota_hero_crystal_maiden", "npc_dota_hero_templar_assassin", "npc_dota_hero_dark_seer", "npc_dota_hero_legion_commander", "npc_dota_hero_slark"};
+local MyBots={"npc_dota_hero_dark_seer", "npc_dota_hero_templar_assassin","npc_dota_hero_crystal_maiden" , "npc_dota_hero_legion_commander", "npc_dota_hero_slark"};
 
 function Think()
 	local IDs=GetTeamPlayers(GetTeam());

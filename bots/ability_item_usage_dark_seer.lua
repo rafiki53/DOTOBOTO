@@ -5,20 +5,23 @@ local ion_shell=npcBot:GetAbilityByName("dark_seer_ion_shell");
 local surge = npcBot:GetAbilityByName("dark_seer_surge")
 local vacuum = npcBot:GetAbilityByName("dark_seer_vacuum")
 local wall = npcBot:GetAbilityByName("dark_seer_wall_of_replica")
-
 local combo_target = nil;
-
+local queue_time = 0;
+local last_time = DotaTime();
 local function SoulAndIonShell(bot)
+
 	local soulring=Utility.IsItemAvailable("item_soul_ring");
-	if soulring ~= nil and soulring:IsFullyCastable() and npcBot:GetHealth()/npcBot:GetMaxHealth() > 0.6  then
-		npcBot:Action_UseAbility(soulring);
-		return true;
+	if soulring ~= nil and soulring:IsFullyCastable() and npcBot:GetHealth()/npcBot:GetMaxHealth() > 0.6 and ion_shell:IsCooldownReady() then
+		npcBot:ActionQueue_UseAbility(soulring);
+		queue_time = 0.5
 	end
 	if ion_shell:IsFullyCastable() then
-	
-		npcBot:Action_UseAbilityOnEntity(ion_shell,bot);
+		npcBot:ActionQueue_UseAbilityOnEntity(ion_shell,bot);
+		queue_time = 0.5
 		return true;
 	end
+	
+
 			
 	
 	return false
@@ -49,10 +52,19 @@ function AbilityUsageThink()
 	
 	--if not casting
 	local currMode = npcBot:GetActiveMode();
-	if npcBot:IsUsingAbility() or npcBot:IsChanneling() or npcBot:NumQueuedActions()~=0 then
+	local prev_time = last_time
+	last_time = DotaTime() 
+	queue_time = queue_time - (last_time-prev_time)
+	
+	if npcBot:IsUsingAbility() or npcBot:IsChanneling()  then
 		return;
 	end
-	
+	if queue_time<0  and npcBot:NumQueuedActions()~=0 then 
+		npcBot:Action_ClearActions( false )
+	end
+	if npcBot:NumQueuedActions()~=0 then
+		return
+	end
 	--if many enemies and alliez use vacuum+wall(requires at least vacuum)
 	local locationAoE = npcBot:FindAoELocation(true, true, npcBot:GetLocation(), vacuum:GetCastRange(),vacuum:GetSpecialValueInt( "radius"  ), vacuum:GetCastPoint(), 0)
 	
@@ -64,6 +76,7 @@ function AbilityUsageThink()
 			
 			npcBot:Action_UseAbilityOnLocation(vacuum,combo_target)
 			npcBot:ActionQueue_UseAbilityOnLocation(wall,combo_target);
+			queue_time = 1.5
 			return
 		end
 		
@@ -120,12 +133,14 @@ function AbilityUsageThink()
 	end
 	
 end
+
 function CourierUsageThink()
 	local npcBot=GetBot();
 	if not IsCourierAvailable() then
 		return
 	end
 	local courier = GetCourier(0);
+	--print (GetCourierState(courier));
 	if (npcBot:IsAlive() and (npcBot:GetStashValue() > 0 or npcBot:GetCourierValue() > 0) ) then
 		npcBot:ActionImmediate_Courier(courier, COURIER_ACTION_TAKE_AND_TRANSFER_ITEMS);
 		npcBot.CourierMoving = true;

@@ -1,4 +1,5 @@
 -------
+--behaviour in this file makes more sense for usual games with ds solo vs trilane, but it is not the case in the most of bot games so it is not used
 
 Utility = require(GetScriptDirectory().."/Utility")
 ----------
@@ -7,8 +8,6 @@ local npcBot = GetBot();
 local lane = LANE_TOP;
 local distance = 1000;
 
-
-local ion_shell=npcBot:GetAbilityByName("dark_seer_ion_shell");
 	
 
 			
@@ -30,11 +29,13 @@ end
 
 
 
-
+--[[
 function Think()
-
+	if npcBot:IsUsingAbility() or npcBot:IsChanneling() or npcBot:NumQueuedActions()~=0 then
+		return 
+	end;
 	npcBot:Action_MoveToLocation(WhereToStand());
 	
 end
-
+--]]
 --------
