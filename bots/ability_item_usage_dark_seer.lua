@@ -87,8 +87,7 @@ function AbilityUsageThink()
 	
 	--cast surge offensively
 	local attacking_allies = npcBot:GetNearbyHeroes(1500,false,BOT_MODE_ATTACK)
-	print(#attacking_allies)
-
+	
 	if #attacking_allies> #npcBot:GetNearbyHeroes(1500,true,BOT_MODE_NONE) and #attacking_allies>1  then
 		if(SurgePlayer(attacking_allies[2])) then
 			return 
