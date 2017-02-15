@@ -35,16 +35,8 @@ local AbilityPriority = {
 local npcBot=GetBot();
 
 local ItemsToBuy = {
-"item_recipe_yasha",
-"item_ogre_axe",
-"item_recipe_sange",
-"item_ultimate_orb",
-"item_recipe_silver_edge",
-"item_javelin",
-"item_belt_of_strength",
 "item_recipe_abyssal_blade",
 "item_recipe_basher",
-"item_stout_shield",
 "item_vitality_booster",
 "item_ring_of_health",
 "item_recipe_greater_crit",
@@ -112,8 +104,40 @@ local function LevelUp()
 
 end
 
+local toSell = {"item_branches", 
+	"item_wraith_band", 
+	"item_bottle",
+	"item_stout_shield",
+	"item_iron_talon",
+	"item_tango",
+	"item_ring_of_protection"
+};
+
+local function SellItems()
+	local npcBot = GetBot();
+	
+	if ( #toSell == 0 ) then
+		return;
+	end
+	for i=1,3 do
+		item_name = toSell[i];
+		where_is_it = npcBot:FindItemSlot( item_name );
+		if where_is_it >= 6 and where_is_it < 9 then
+			item = npcBot:GetItemInSlot( where_is_it );
+			npcBot:ActionImmediate_SellItem( item);
+		end
+		where_is_it = npcBot:FindItemSlot( item_name );
+		if where_is_it ~= -1 and item_name == "item_bottle" and DotaTime() > 2400 then
+			item = npcBot:GetItemInSlot( where_is_it );
+			npcBot:ActionImmediate_SellItem( item);
+		end
+	end
+end
+
 function ItemPurchaseThink()
 	local npcBot = GetBot();
+	
+	SellItems();
 	
 	if npcBot:GetAbilityPoints()>0 then
 		LevelUp();
@@ -121,6 +145,12 @@ function ItemPurchaseThink()
 	
 	if (ItemsToBuy==nil or #ItemsToBuy == 0 ) then
 		npcBot:SetNextItemPurchaseValue( 0 );
+		return;
+	end
+	
+	havetp = (npcBot:FindItemSlot("item_tpscroll") ~= -1);
+	if not havetp and DotaTime() >= 300 and npcBot:GetGold() >= GetItemCost( "item_tpscroll" ) then
+		npcBot:ActionImmediate_PurchaseItem( "item_tpscroll" );
 		return;
 	end
 	

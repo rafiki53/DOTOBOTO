@@ -80,48 +80,82 @@ function LevelUp()
 
     if( #Ability_Priority == 0 )
     then
-        print( "Warning: LevelUp called but Ability_Priority is empty." )
+        --print( "Warning: LevelUp called but Ability_Priority is empty." )
         return
     end
 
     local Ability_Name = Ability_Priority[1]
     if( Ability_Name == nil )
     then
-        print( "New level achieved, but no ability can be upgraded." )
+        --print( "New level achieved, but no ability can be upgraded." )
         return
     else
-        print( "New level achieved - upgrading ability: " .. Ability_Name )
+        --print( "New level achieved - upgrading ability: " .. Ability_Name )
     end
 
 
     local Ability = Bot:GetAbilityByName( Ability_Name )
     if( Ability == nil )
     then
-        print( "Warning: Ability " .. Ability_Name .. " not found." )
+        --print( "Warning: Ability " .. Ability_Name .. " not found." )
     elseif( Ability:CanAbilityBeUpgraded() and Ability:GetLevel() < Ability:GetMaxLevel() )
     then
         Bot:ActionImmediate_LevelAbility( Ability_Name )
-        print( "Ability upgraded successfully." )
+        --print( "Ability upgraded successfully." )
     else
-        print( "Warning: ability " .. Ability_Name .. " can not be upgraded." )
+        --print( "Warning: ability " .. Ability_Name .. " can not be upgraded." )
     end
 
     table.remove( Ability_Priority, 1 )
 
 end
 
+local toSell = {"item_branches", 
+	"item_wraith_band", 
+	"item_bottle",
+	"item_stout_shield",
+	"item_iron_talon",
+	"item_tango"
+};
 
+local function SellItems()
+	local npcBot = GetBot();
+	
+	if ( #toSell == 0 ) then
+		return;
+	end
+	for i=1,3 do
+		item_name = toSell[i];
+		where_is_it = npcBot:FindItemSlot( item_name );
+		if where_is_it >= 6 and where_is_it < 9 then
+			item = npcBot:GetItemInSlot( where_is_it );
+			npcBot:ActionImmediate_SellItem( item);
+		end
+		where_is_it = npcBot:FindItemSlot( item_name );
+		if where_is_it ~= -1 and item_name == "item_bottle" and DotaTime() > 2400 then
+			item = npcBot:GetItemInSlot( where_is_it );
+			npcBot:ActionImmediate_SellItem( item);
+		end
+	end
+end
 
 function ItemPurchaseThink()
 
     if( not InGame() ) then return end
 
+	SellItems();
+	
     if( Bot:GetAbilityPoints() > 0 )
     then
         LevelUp()
     end
 
-
+	local npcBot = GetBot();
+	havetp = (npcBot:FindItemSlot("item_tpscroll") ~= -1);
+	if not havetp and DotaTime() >= 300 and npcBot:GetGold() >= GetItemCost( "item_tpscroll" ) then
+		npcBot:ActionImmediate_PurchaseItem( "item_tpscroll" );
+		return;
+	end
 
     while true
     do
@@ -147,17 +181,17 @@ function ItemPurchaseThink()
     then
         if ( Psc and Dsc == 0 ) or ( Psd and Dsd == 0 )
         then
-            print( "In shop" )
+            --print( "In shop" )
             Buy = true
         elseif Psd and Dsd <= 2500
         then
-            print( "Close to shop: " .. Dsd )
+            --print( "Close to shop: " .. Dsd )
             Buy = false
         elseif Psc
         then
             Buy = false
         else
-            print( "In shop" )
+            --print( "In shop" )
             Buy = true
         end
     end

@@ -5,6 +5,7 @@ local ion_shell=npcBot:GetAbilityByName("dark_seer_ion_shell");
 local surge = npcBot:GetAbilityByName("dark_seer_surge")
 local vacuum = npcBot:GetAbilityByName("dark_seer_vacuum")
 local wall = npcBot:GetAbilityByName("dark_seer_wall_of_replica")
+
 local combo_target = nil;
 local queue_time = 0;
 local last_time = DotaTime();
@@ -48,6 +49,7 @@ local function SurgePlayer(bot)
 	end
 	return false
 end
+
 function AbilityUsageThink()
 	
 	--if not casting
@@ -68,7 +70,7 @@ function AbilityUsageThink()
 	--if many enemies and alliez use vacuum+wall(requires at least vacuum)
 	local locationAoE = npcBot:FindAoELocation(true, true, npcBot:GetLocation(), vacuum:GetCastRange(),vacuum:GetSpecialValueInt( "radius"  ), vacuum:GetCastPoint(), 0)
 	
-	if locationAoE.count>2  then
+	if locationAoE.count>1  then
 		
 		if vacuum:IsFullyCastable() then
 			
@@ -132,6 +134,15 @@ function AbilityUsageThink()
 		end
 	end
 	
+end
+
+function BuybackUsageThink()
+	local npcBot=GetBot()
+	if DotaTime() < 2400 then
+		return
+	elseif npcBot:HasBuyback() and (not npcBot:IsAlive()) then
+		npcBot:ActionImmediate_Buyback()
+	end
 end
 
 function CourierUsageThink()
