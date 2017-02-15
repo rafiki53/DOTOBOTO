@@ -6,8 +6,7 @@ Utility = require(GetScriptDirectory().."/Utility")
 local npcBot = GetBot();
 local lane = LANE_TOP;
 local distance = 1000;
-local curr_hp = 0.0;
-local last_harassed = GameTime();
+
 
 local ion_shell=npcBot:GetAbilityByName("dark_seer_ion_shell");
 	

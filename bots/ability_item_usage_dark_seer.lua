@@ -3,9 +3,10 @@ Utility = require( GetScriptDirectory().."/Utility");
 local npcBot=GetBot();
 local ion_shell=npcBot:GetAbilityByName("dark_seer_ion_shell");
 local surge = npcBot:GetAbilityByName("dark_seer_surge")
-local vacuum = npcBot:GetAbilityByName("dark_seer_surge")
+local vacuum = npcBot:GetAbilityByName("dark_seer_vacuum")
 local wall = npcBot:GetAbilityByName("dark_seer_wall_of_replica")
 
+local combo_target = nil;
 
 local function SpamIonShell()
 	--allied creeps
@@ -53,11 +54,48 @@ local function SurgePlayer(bot)
 	return false
 end
 function AbilityUsageThink()
+	
+	
+
+	
 	--if not casting
 	local currMode = npcBot:GetActiveMode();
 	if npcBot:IsUsingAbility() or npcBot:IsChanneling() then
 		return;
 	end
+	
+	
+	if combo_target ~= nil then
+		local target = combo_target
+		combo_target = nil
+		if wall:IsFullyCastable() then
+			npcBot:Action_UseAbilityOnLocation(wall,target);
+			return
+			
+		end
+		
+	end
+	
+	--if many enemies and alliez use vacuum+wall(requires at least vacuum)
+	
+	local locationAoE = npcBot:FindAoELocation(true, true, npcBot:GetLocation(), vacuum:GetCastRange(),vacuum:GetSpecialValueInt( "radius"  ), vacuum:GetCastPoint(), 0)
+	--@maybe add condition for nearby allies, so you dont attack alone, maybe mana condition
+	if locationAoE.count>2  then
+		
+		if vacuum:IsFullyCastable() then
+			
+			combo_target = locationAoE.targetloc
+			
+			npcBot:Action_UseAbilityOnLocation(vacuum,combo_target)
+			return
+		end
+		
+	end
+	
+	
+	
+	
+	
 	
 	
 	--if you or some allies are in retreat mode, cast surge
@@ -80,8 +118,7 @@ function AbilityUsageThink()
 	--@or when noone around?
 	
 	
-	--if many enemies and alliez use vacuum+wall(requires at least vacuum)
-	
+
 	--if in farm or lane mode spam ion shell on creeps
 	if( currMode == BOT_MODE_LANING or currMode == BOT_MODE_FARM) then
 		--spam ion shell on creeps
@@ -112,7 +149,6 @@ function CourierUsageThink()
 		return
 	end
 	local courier = GetCourier(0);
-	--print (GetCourierState(courier));
 	if (npcBot:IsAlive() and (npcBot:GetStashValue() > 0 or npcBot:GetCourierValue() > 0) ) then
 		npcBot:ActionImmediate_Courier(courier, COURIER_ACTION_TAKE_AND_TRANSFER_ITEMS);
 		npcBot.CourierMoving = true;
