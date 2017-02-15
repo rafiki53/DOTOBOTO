@@ -32,12 +32,6 @@ end
 
 
 function Think()
-	--print(last_hp)
-	
-	--if not casting 
-	--think about casting
-	--if you are being harassed move back(flag harrased that takes 1-2 sec)
-	--if enemy is low make him more miserable
 
 	npcBot:Action_MoveToLocation(WhereToStand());
 	

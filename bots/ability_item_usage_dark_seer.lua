@@ -8,43 +8,35 @@ local wall = npcBot:GetAbilityByName("dark_seer_wall_of_replica")
 
 local combo_target = nil;
 
+local function SoulAndIonShell(bot)
+	local soulring=Utility.IsItemAvailable("item_soul_ring");
+	if soulring ~= nil and soulring:IsFullyCastable() and npcBot:GetHealth()/npcBot:GetMaxHealth() > 0.6  then
+		npcBot:Action_UseAbility(soulring);
+		return true;
+	end
+	if ion_shell:IsFullyCastable() then
+	
+		npcBot:Action_UseAbilityOnEntity(ion_shell,bot);
+		return true;
+	end
+			
+	
+	return false
+end
+
 local function SpamIonShell()
 	--allied creeps
-	
-		
 	local creeps=npcBot:GetNearbyCreeps(1300,false)
 	
-	--print(GetTeam());
 	for _,creep in pairs(creeps) do
 		if(creep:GetAttackRange()==100 and creep:GetHealth()>350 and not(creep:HasModifier("modifier_dark_seer_ion_shell")) )then
-			local soulring=Utility.IsItemAvailable("item_soul_ring");
-			if soulring ~= nil and soulring:IsFullyCastable() and npcBot:GetHealth()/npcBot:GetMaxHealth() > 0.6  then
-				npcBot:Action_UseAbility(soulring);
-				return true;
-			end
-			if ion_shell:IsFullyCastable() then
-			
-				npcBot:Action_UseAbilityOnEntity(ion_shell,creep);
-				return true
-			end
-			
+			return SoulAndIonShell(creep)
 		end
-	
 	end
-	return false
-			
+	return false		
 	
 end
-local function IonShellPlayer(bot)
-	if ion_shell:IsFullyCastable() then
-			
-		npcBot:Action_UseAbilityOnEntity(ion_shell,bot);
-		return true
-	end
-			
-	
-	return false
-end
+
 
 local function SurgePlayer(bot)
 	if surge:IsFullyCastable() then
@@ -55,31 +47,15 @@ local function SurgePlayer(bot)
 end
 function AbilityUsageThink()
 	
-	
-
-	
 	--if not casting
 	local currMode = npcBot:GetActiveMode();
-	if npcBot:IsUsingAbility() or npcBot:IsChanneling() then
+	if npcBot:IsUsingAbility() or npcBot:IsChanneling() or npcBot:NumQueuedActions()~=0 then
 		return;
 	end
 	
-	
-	if combo_target ~= nil then
-		local target = combo_target
-		combo_target = nil
-		if wall:IsFullyCastable() then
-			npcBot:Action_UseAbilityOnLocation(wall,target);
-			return
-			
-		end
-		
-	end
-	
 	--if many enemies and alliez use vacuum+wall(requires at least vacuum)
-	
 	local locationAoE = npcBot:FindAoELocation(true, true, npcBot:GetLocation(), vacuum:GetCastRange(),vacuum:GetSpecialValueInt( "radius"  ), vacuum:GetCastPoint(), 0)
-	--@maybe add condition for nearby allies, so you dont attack alone, maybe mana condition
+	
 	if locationAoE.count>2  then
 		
 		if vacuum:IsFullyCastable() then
@@ -87,16 +63,11 @@ function AbilityUsageThink()
 			combo_target = locationAoE.targetloc
 			
 			npcBot:Action_UseAbilityOnLocation(vacuum,combo_target)
+			npcBot:ActionQueue_UseAbilityOnLocation(wall,combo_target);
 			return
 		end
 		
 	end
-	
-	
-	
-	
-	
-	
 	
 	--if you or some allies are in retreat mode, cast surge
 	if(npcBot:GetActiveMode()==BOT_MODE_RETREAT) then
@@ -114,28 +85,35 @@ function AbilityUsageThink()
 	
 	
 	
-	--@cast surge offensively? 
-	--@or when noone around?
+	--cast surge offensively
+	local attacking_allies = npcBot:GetNearbyHeroes(1500,false,BOT_MODE_ATTACK)
+	print(#attacking_allies)
+
+	if #attacking_allies> #npcBot:GetNearbyHeroes(1500,true,BOT_MODE_NONE) and #attacking_allies>1  then
+		if(SurgePlayer(attacking_allies[2])) then
+			return 
+		end
+	end
 	
 	
 
 	--if in farm or lane mode spam ion shell on creeps
 	if( currMode == BOT_MODE_LANING or currMode == BOT_MODE_FARM) then
 		--spam ion shell on creeps
-		if(SpamIonShell())then
-			return
+		if SpamIonShell() then
+			return;
 		end
 	end
 	--if appropriate mode is selected spam ion shell on heroes
 	if ( currMode == BOT_MODE_ATTACK or currMode==BOT_MODE_PUSH_TOWER_TOP or currMode==BOT_MODE_PUSH_TOWER_MID or currMode==BOT_MODE_PUSH_TOWER_BOT or currMode==BOT_MODE_PUSH_TOWER_TOP  or currMode==BOT_MODE_DEFEND_TOWER_MID or currMode==BOT_MODE_DEFEND_TOWER_BOT or currMode==BOT_MODE_DEFEND_TOWER_TOP) then
-		if npcBot:GetAttackRange()== 150 and not(npcBot:HasModifier("modifier_dark_seer_ion_shell")) then
-			if IonShellPlayer(npcBot)then
+		if not(npcBot:HasModifier("modifier_dark_seer_ion_shell")) then
+			if SoulAndIonShell(npcBot)then
 				return
 			end
 		end
 		for _,ally in pairs(npcBot:GetNearbyHeroes(1000,false,npcBot:GetActiveMode())) do
 			if ally:GetAttackRange()== 150 and not(ally:HasModifier("modifier_dark_seer_ion_shell")) then
-				if IonShellPlayer(ally)then
+				if SoulAndIonShell(ally)then
 					return
 				end
 			end
