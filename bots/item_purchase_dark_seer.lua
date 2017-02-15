@@ -35,7 +35,8 @@ local npcBot=GetBot();
 npcBot.ItemsToBuy = {
 "item_tango",
 "item_stout_shield",
-"item_flask",
+"item_clarity",
+"item_clarity",
 "item_clarity",
 "item_recipe_soul_ring",
 "item_sobi_mask",

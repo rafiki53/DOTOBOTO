@@ -21,7 +21,7 @@ end
 local function WhereToStand()
 
 	if(npcBot:WasRecentlyDamagedByAnyHero(2) or npcBot:WasRecentlyDamagedByTower(2)) then
-		distance = 3000
+		distance = 4000
 	else
 		distance = 1000
 	end
