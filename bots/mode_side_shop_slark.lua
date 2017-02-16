@@ -11,7 +11,7 @@ function GetDesire()
 
     if IsItemPurchasedFromSideShop( Item ) and Bot:GetGold() >= GetItemCost( Item )
     then
-        return math.min(1.0, 600.0 / ( 1 + Bot:DistanceFromSideShop() ))
+        return Clamp( 600.0 / ( 1.0 + Bot:DistanceFromSideShop() ), 0.0, 1.0 )
     else
         return BOT_MODE_DESIRE_NONE
 	end
@@ -21,7 +21,7 @@ end
 
 
 
-function OnStart()
+function Think()
 
     Shop1 = GetShopLocation( Bot:GetTeam(), SHOP_SIDE )
     Shop2 = GetShopLocation( Bot:GetTeam(), SHOP_SIDE2 )

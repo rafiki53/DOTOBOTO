@@ -11,7 +11,7 @@ function GetDesire()
 
     if IsItemPurchasedFromSecretShop( Item ) and Bot:GetGold() >= GetItemCost( Item )
     then
-        return 600 / ( 1 + Bot:DistanceFromSecretShop() )
+        return Clamp( 600.0 / ( 1.0 + Bot:DistanceFromSecretShop() ), 0.0, 1.0 )
     else
         return BOT_MODE_DESIRE_NONE
 	end
@@ -21,7 +21,7 @@ end
 
 
 
-function OnStart()
+function Think()
 
     Shop1 = GetShopLocation( Bot:GetTeam(), SHOP_SECRET )
     Shop2 = GetShopLocation( Bot:GetTeam(), SHOP_SECRET2 )
